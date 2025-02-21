@@ -14,9 +14,14 @@ const PORT = ENVIROMENT.PORT
 //Cross-Origin Resource Sharing
 app.use(
     cors({
-        origin: ENVIROMENT.URL_FRONTEND,
+        origin: [
+            "http://localhost:5173",
+            "https://front-slack.vercel.app"
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE"],
     })
-)
+);
+
 
 app.use(express.json())
 
