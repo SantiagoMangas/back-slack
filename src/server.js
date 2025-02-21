@@ -9,19 +9,14 @@ require('dotenv').config();
 
 const app = express()
 const PORT = ENVIROMENT.PORT 
-
+require('dotenv').config();
 
 //Cross-Origin Resource Sharing
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://front-slack.vercel.app"
-        ],
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        origin: ENVIROMENT.URL_FRONTEND,
     })
-);
-
+)
 
 app.use(express.json())
 
