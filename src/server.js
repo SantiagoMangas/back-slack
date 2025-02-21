@@ -5,10 +5,10 @@ import connectToMongoDB from './config/mongoDB.config.js'
 import User from './models/User.model.js'
 import cors from 'cors'
 
+require('dotenv').config();
 
 const app = express()
 const PORT = ENVIROMENT.PORT 
-
 
 
 //Cross-Origin Resource Sharing
