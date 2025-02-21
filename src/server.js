@@ -14,7 +14,7 @@ const PORT = ENVIROMENT.PORT
 //Cross-Origin Resource Sharing
 app.use(
     cors({
-        origin: 'http://localhost:5173'
+        origin: ENVIROMENT.URL_FRONTEND,
     })
 )
 
@@ -39,6 +39,7 @@ import authRouter from './routes/auth.route.js'
 import channelRouter from './routes/channel.route.js'
 import { sendMail } from './utils/mail.util.js'
 import workspaceRouter from './routes/workspace.route.js'
+import userRouter from './routes/profile.route.js'
 
 
 //Delegamos el flujo de consultas a /api/status al enrutador de status
@@ -49,6 +50,8 @@ app.use('/api/auth', authRouter)
 app.use('/api/workspace', workspaceRouter)
 
 app.use('/api/channel', channelRouter)
+
+app.use('/api/profile', userRouter)
 
 app.listen(PORT, () =>{
     console.log(`El servidor se esta ejecutando en http://localhost:${PORT}`)

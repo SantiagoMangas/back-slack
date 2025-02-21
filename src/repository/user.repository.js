@@ -71,6 +71,26 @@ class UserRepository{
         `
         await pool.execute(queryStr, [user_id])
     }
+
+    async updateUser(user_id, {username, img_profile}){
+        const params = []
+        const query = []
+        if(username){
+            query.push('username = ?')
+            params.push(username)
+        }
+        if(img_profile){
+            query.push('img_profile = ?')
+            params.push(img_profile)
+        }
+        if(query.length == 0){
+            return
+        }
+        params.push(user_id)
+        const queryString = `UPDATE USERS SET ${query.join(', ')} WHERE _id = ?`
+        const [result] = await pool.execute(queryString, params)
+        return result
+    }
 }
 
 export default new UserRepository()
