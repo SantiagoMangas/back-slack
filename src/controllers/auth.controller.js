@@ -213,44 +213,53 @@ export const loginController =  async (req, res) => {
 
 export const forgotPasswordController = async (req, res) =>{
     try{
-        console.log(req.body)
-        const {email} = req.body
-        const user_found = await UserRepository.findUserByEmail(email)
+        console.log("Solicitud de recuperación recibida:", req.body);
+        const {email} = req.body;
+        
+        // Verificar si el usuario existe
+        const user_found = await UserRepository.findUserByEmail(email);
         if(!user_found){
+            console.log("Usuario no encontrado:", email);
             return res.json({
                 ok: false,
                 status: 404,
                 message: 'User not found'
-            })
+            });
         }
-        else{
-            const reset_token = jwt.sign({email}, ENVIROMENT.SECRET_KEY_JWT, {expiresIn: '1d'})
-            const reset_url = `${ENVIROMENT.URL_FRONTEND}/reset-password?reset_token=${reset_token}`
-            await sendMail({
-                to: email,
-                subject: 'Restablecer contraseña',
-                html: `
-                    <h1>Restablecer contraseña</h1>
-                    <p>Haz click en el enlace de abajo para restablecer tu contraseña</p>
-                    <a href='${reset_url}'>Restablecer contraseña</a>
-                `
-            })
-            return res.json({
-                ok: true,
-                status: 200,
-                message: 'Email sent'
-            })
-        }
+
+        // Generar token de reseteo
+        const reset_token = jwt.sign({email}, ENVIROMENT.SECRET_KEY_JWT, {expiresIn: '1d'});
+        const reset_url = `${ENVIROMENT.URL_FRONTEND}/reset-password?reset_token=${reset_token}`;
+        console.log("Token generado:", reset_token);
+
+        // Intentar enviar el correo
+        const mailResponse = await sendMail({
+            to: email,
+            subject: 'Restablecer contraseña',
+            html: `
+                <h1>Restablecer contraseña</h1>
+                <p>Haz click en el enlace de abajo para restablecer tu contraseña</p>
+                <a href='${reset_url}'>Restablecer contraseña</a>
+            `
+        });
+
+        console.log("Respuesta del envío de correo:", mailResponse);
+
+        return res.json({
+            ok: true,
+            status: 200,
+            message: 'Email sent'
+        });
     }
     catch(error){
-        console.error(error)
+        console.error("Error en forgotPasswordController:", error);
         return res.json({
             ok:false,
             message: "Internal server error",
             status: 500,
-        })
+        });
     }
-} 
+}
 
 export const resetPasswordController = async (req, res) =>{
     try{
