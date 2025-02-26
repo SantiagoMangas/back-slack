@@ -5,36 +5,39 @@ import WorkspaceRepository from "../repository/workspaces.repository.js"
 import UserRepository from "../repository/user.repository.js"
 import { ServerError } from "../utils/errors.util.js"
 
-export const createWorkspaceController = async (req, res) =>{
-    try{
-        const {name} = req.body
-        const {id} = req.user
-        const new_workspace = await WorkspaceRepository.createWorkspace(
-            {
-                name,
-                id
-            }
-        )
-        
-        
-        res.json({
-            ok: true, 
-            message: 'Workspace created',
-            status: 201,
-            data: {
-                new_workspace
-            }
+export const createWorkspaceController = async (req, res) => {
+    try {
+      const { id } = req.user
+      const { name } = req.body
+  
+      if (!name) {
+        return res.status(400).json({
+          ok: false,
+          message: "Workspace name is required",
+          status: 400,
         })
+      }
+  
+      const workspace = await WorkspaceRepository.createWorkspace(id, name)
+  
+      return res.status(201).json({
+        ok: true,
+        message: "Workspace created successfully",
+        status: 201,
+        data: {
+          workspace,
+        },
+      })
+    } catch (error) {
+      console.error("Error in createWorkspaceController:", error)
+      return res.status(500).json({
+        ok: false,
+        message: "Internal server error",
+        status: 500,
+        error: error.message,
+      })
     }
-    catch(error){
-        console.error(error)
-        return res.json({
-            ok:false,
-            message: "Internal server error",
-            status: 500,
-        })
-    }
-}
+  }  
 
 export const inviteUserToWorkspaceController = async (req, res) =>{
     try{
@@ -77,28 +80,26 @@ export const inviteUserToWorkspaceController = async (req, res) =>{
     }
 }
 
-export const getWorkspacesController = async (req, res) =>{
-    try{
-        console.log(req.user)
-        const {id} = req.user
-
-        const workspaces = await WorkspaceRepository.getAllWorkspacesByMemberId(id)
-
-        res.json({
-            status: 200,
-            ok: true,
-            message: 'Workspaces',
-            data: {
-                workspaces
-            }
-        })
+export const getWorkspacesController = async (req, res) => {
+    try {
+      const { id } = req.user
+      const workspaces = await WorkspaceRepository.getAllWorkspacesByUserId(id)
+  
+      return res.json({
+        ok: true,
+        status: 200,
+        message: "Workspaces list",
+        data: {
+          workspaces,
+        },
+      })
+    } catch (error) {
+      console.error("Error in getWorkspacesController:", error)
+      return res.status(500).json({
+        ok: false,
+        message: "Internal server error",
+        status: 500,
+        error: error.message,
+      })
     }
-    catch(error){
-        console.error(error)
-        return res.json({
-            ok:false,
-            message: "Internal server error",
-            status: 500,
-        })
-    }
-}
+  }
