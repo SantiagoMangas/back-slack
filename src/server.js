@@ -50,6 +50,8 @@ app.use('/api/channel', channelRouter)
 
 app.use('/api/profile', userRouter)
 
+router.get('/:workspace_id/:channel_id', verifyToken, getChannelByIdController)
+
 app.listen(PORT, () =>{
     console.log(`El servidor se esta ejecutando en http://localhost:${PORT}`)
 })

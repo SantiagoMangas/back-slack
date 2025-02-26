@@ -63,20 +63,57 @@ export const getChannelsListController = async (req, res) =>{
     }
 }
 
-export const sendMessageController = async (req, res) =>{
-    try{
-        const {channel_id, workspace_id} = req.params
-        const {content} = req.body
-        const {id} = req.user
-        const channel_selected = ChannelRepository.getChannelById(channel_id)
-        if(!channel_selected){
+export const getChannelController = async (req, res) => {
+    try {
+        const { channel_id, workspace_id } = req.params
+        const channel = await ChannelRepository.getChannelById(channel_id)
+        
+        if (!channel) {
             return res.json({
                 ok: false,
                 message: 'Channel not found',
                 status: 404
             })
         }
-        //Si en el futuro desear que cada canal tenga miembros, entonces deben checkearlo aqui
+        
+        const messages = await MessageRepository.getAllMessagesFromChannel(channel_id)
+        
+        return res.json({
+            ok: true,
+            status: 200,
+            message: 'Channel data',
+            data: {
+                name: channel.name,
+                _id: channel._id,
+                workspace: channel.workspace,
+                messages
+            }
+        })
+    } catch (error) {
+        console.error(error)
+        return res.json({
+            ok: false,
+            message: "Internal server error",
+            status: 500,
+        })
+    }
+}
+
+export const sendMessageController = async (req, res) => {
+    try {
+        const { channel_id, workspace_id } = req.params
+        const { content } = req.body
+        const { id } = req.user
+        
+        const channel = await ChannelRepository.getChannelById(channel_id)
+        if (!channel) {
+            return res.json({
+                ok: false,
+                message: 'Channel not found',
+                status: 404
+            })
+        }
+        
         const new_message = await MessageRepository.createMessage({
             sender_user_id: id,
             content,
@@ -85,22 +122,20 @@ export const sendMessageController = async (req, res) =>{
 
         return res.json({
             ok: true,
-            message: 'Was sent successfully',
+            message: 'Message sent successfully',
             status: 201,
             data: {
                 new_message
             }
         })
-    }
-    catch(error){
+    } catch (error) {
         console.error(error)
         return res.json({
-            ok:false,
+            ok: false,
             message: "Internal server error",
             status: 500,
         })
     }
-
 }
 
 
@@ -131,6 +166,45 @@ export const getMessagesFromChannelController = async (req, res) =>{
         console.error(error)
         return res.json({
             ok:false,
+            message: "Internal server error",
+            status: 500,
+        })
+    }
+}
+export const getChannelByIdController = async (req, res) => {
+    try {
+        const { channel_id, workspace_id } = req.params
+        
+        // Obtener el canal
+        const channels = await ChannelRepository.getChannelById(channel_id)
+        if (!channels || channels.length === 0) {
+            return res.json({
+                ok: false,
+                message: 'Channel not found',
+                status: 404
+            })
+        }
+        
+        const channel = channels[0] // Debido a que getChannelById devuelve un array
+        
+        // Obtener los mensajes del canal
+        const messages = await MessageRepository.getAllMessagesFromChannel(channel_id)
+        
+        return res.json({
+            ok: true,
+            status: 200,
+            message: 'Channel data',
+            data: {
+                _id: channel._id,
+                name: channel.name,
+                workspace: channel.workspace,
+                messages: messages
+            }
+        })
+    } catch (error) {
+        console.error("Error en getChannelByIdController:", error)
+        return res.json({
+            ok: false,
             message: "Internal server error",
             status: 500,
         })

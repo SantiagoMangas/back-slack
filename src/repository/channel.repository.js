@@ -33,10 +33,10 @@ class ChannelRepository{
         return channels
     }
 
-    async getChannelById (channel_id) {
+    async getChannelById(channel_id) {
         const query = `SELECT * FROM channels WHERE _id = ?`
         const [channels] = await pool.execute(query, [channel_id])
-        return channels
+        return channels // Retorna el array completo
     }
 }
 
