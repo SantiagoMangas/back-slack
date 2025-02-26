@@ -211,14 +211,14 @@ export const loginController =  async (req, res) => {
     
 }
 
-export const forgotPasswordController = async (req, res) =>{
-    try{
+export const forgotPasswordController = async (req, res) => {
+    try {
         console.log("Solicitud de recuperación recibida:", req.body);
-        const {email} = req.body;
+        const { email } = req.body;
         
         // Verificar si el usuario existe
         const user_found = await UserRepository.findUserByEmail(email);
-        if(!user_found){
+        if (!user_found) {
             console.log("Usuario no encontrado:", email);
             return res.json({
                 ok: false,
@@ -228,12 +228,12 @@ export const forgotPasswordController = async (req, res) =>{
         }
 
         // Generar token de reseteo
-        const reset_token = jwt.sign({email}, ENVIROMENT.SECRET_KEY_JWT, {expiresIn: '1d'});
+        const reset_token = jwt.sign({ email }, ENVIROMENT.SECRET_KEY_JWT, { expiresIn: '1d' });
         const reset_url = `${ENVIROMENT.URL_FRONTEND}/reset-password?reset_token=${reset_token}`;
         console.log("Token generado:", reset_token);
 
         // Intentar enviar el correo
-        const mailResponse = await sendMail({
+        const mailResult = await sendMail({
             to: email,
             subject: 'Restablecer contraseña',
             html: `
@@ -243,7 +243,16 @@ export const forgotPasswordController = async (req, res) =>{
             `
         });
 
-        console.log("Respuesta del envío de correo:", mailResponse);
+        console.log("Respuesta detallada del envío de correo:", mailResult);
+        
+        if (!mailResult || !mailResult.success) {
+            return res.json({
+                ok: false,
+                status: 500,
+                message: 'Failed to send email',
+                error: mailResult ? mailResult.error : 'Unknown error'
+            });
+        }
 
         return res.json({
             ok: true,
@@ -251,10 +260,10 @@ export const forgotPasswordController = async (req, res) =>{
             message: 'Email sent'
         });
     }
-    catch(error){
+    catch (error) {
         console.error("Error en forgotPasswordController:", error);
         return res.json({
-            ok:false,
+            ok: false,
             message: "Internal server error",
             status: 500,
         });

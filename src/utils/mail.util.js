@@ -11,8 +11,9 @@ export const sendMail = async ({ to, subject, html }) => {
         });
 
         console.log("Correo enviado:", data);
-        return data;
+        return { success: true, data };
     } catch (error) {
         console.error('ERROR al enviar mail:', error);
+        return { success: false, error: error.message };
     }
 };
