@@ -39,7 +39,8 @@ class ChannelRepository{
     
         const [channels] = await pool.execute(query, [channel_id]);
         console.log("Resultado de la consulta:", channels);
-    
+        console.log("Tipo de channel_id:", typeof channel_id);
+        
         return channels;
     }    
 }

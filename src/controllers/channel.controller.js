@@ -51,53 +51,20 @@ export const createChannelController = async (req, res) => {
 export const getChannelByIdController = async (req, res) => {
     try {
         const { channel_id } = req.params;
-        
         console.log(`Buscando canal con ID: ${channel_id}`);
+        
         const channels = await ChannelRepository.getChannelById(channel_id);
         console.log("Resultado de getChannelById:", channels);
 
         if (!channels || channels.length === 0) {
             console.error("No se encontró el canal");
-            return res.status(404).json({
-                ok: false,
-                message: 'Channel not found',
-                status: 404
-            });
+            return res.status(404).json({ ok: false, message: 'Channel not found', status: 404 });
         }
 
-        const channel = channels[0];
-        console.log("Canal encontrado:", channel);
-
-        try {
-            const messages = await MessageRepository.getAllMessagesFromChannel(channel_id);
-            console.log("Mensajes obtenidos:", messages);
-            return res.json({
-                ok: true,
-                status: 200,
-                message: 'Channel data',
-                data: {
-                    _id: channel._id,
-                    name: channel.name,
-                    workspace: channel.workspace,
-                    messages: messages
-                }
-            });
-        } catch (msgError) {
-            console.error("Error obteniendo los mensajes:", msgError);
-            return res.status(500).json({
-                ok: false,
-                message: "Error obteniendo los mensajes del canal",
-                status: 500
-            });
-        }
+        return res.json({ ok: true, status: 200, message: 'Channel data', data: channels[0] });
     } catch (error) {
         console.error("Error en getChannelByIdController:", error);
-        return res.status(500).json({
-            ok: false,
-            message: "Internal server error",
-            status: 500,
-            error: error.message,
-        });
+        return res.status(500).json({ ok: false, message: "Internal server error", status: 500, error: error.message });
     }
 };
 
