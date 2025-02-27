@@ -31,7 +31,7 @@ class ChannelRepository {
     const query = `SELECT * FROM channels WHERE _id = ?`
     try {
       const [channels] = await pool.execute(query, [channel_id])
-      return channels[0] // Retorna el primer canal encontrado o undefined si no hay resultados
+      return channels
     } catch (error) {
       console.error("Error al obtener el canal por ID:", error)
       throw error
