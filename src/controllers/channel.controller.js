@@ -91,32 +91,29 @@ export const getChannelByIdController = async (req, res) => {
     }
 };
 
-export const getChannelsListController = async (req, res) =>{
-    try{
-        const {id} = req.user
-        const {workspace_id} = req.params
-        const {workspace_selected} = req
+export const getChannelsListController = async (req, res) => {
+    try {
+        const { workspace_id } = req.params;
+        console.log("Obteniendo canales para workspace:", workspace_id);
 
-        const channels = await ChannelRepository.getAllChannelsByWorkspaceId(workspace_id)
+        const channels = await ChannelRepository.getAllChannelsByWorkspaceId(workspace_id);
+        console.log("Canales obtenidos desde la BD:", channels);
 
         return res.json({
             ok: true,
             status: 200,
-            message: 'Channels list',
-            data: {
-                channels
-            }
-        })
-    }
-    catch(error){
-        console.error(error)
+            message: "Channels list",
+            data: { channels },
+        });
+    } catch (error) {
+        console.error("Error en getChannelsListController:", error);
         return res.json({
-            ok:false,
+            ok: false,
             message: "Internal server error",
             status: 500,
-        })
+        });
     }
-}
+};
 
 export const sendMessageController = async (req, res) =>{
     try{
