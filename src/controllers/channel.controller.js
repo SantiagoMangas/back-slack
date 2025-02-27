@@ -24,7 +24,7 @@ export const createChannelController = async (req, res) => {
   
       const channels = await ChannelRepository.getAllChannelsByWorkspaceId(workspace_id)
       console.log("Canales después de creación:", channels);
-
+      
       return res.status(201).json({
         ok: true,
         message: "Canal creado exitosamente",
@@ -44,25 +44,31 @@ export const createChannelController = async (req, res) => {
       })
     }
 }
-  export const getChannelByIdController = async (req, res) => {
+
+export const getChannelByIdController = async (req, res) => {
     try {
-        const { channel_id, workspace_id } = req.params
+        const { channel_id } = req.params;
         
-const channel_selected = await ChannelRepository.getChannelById(channel_id);
+        console.log(`Buscando canal con ID: ${channel_id}`);
+        const channels = await ChannelRepository.getChannelById(channel_id);
+        console.log("Resultado de getChannelById:", channels);
+
         if (!channels || channels.length === 0) {
-            console.error(`No se encontró el canal con ID: ${channel_id}`);
+            console.error("No se encontró el canal");
             return res.status(404).json({
                 ok: false,
                 message: 'Channel not found',
                 status: 404
             });
-        }        
-        
-        const channel = channels[0] // Debido a que getChannelById devuelve un array
-        
+        }
+
+        const channel = channels[0];
+        console.log("Canal encontrado:", channel);
+
         // Obtener los mensajes del canal
-        const messages = await MessageRepository.getAllMessagesFromChannel(channel_id)
-        
+        const messages = await MessageRepository.getAllMessagesFromChannel(channel_id);
+        console.log("Mensajes obtenidos:", messages);
+
         return res.json({
             ok: true,
             status: 200,
@@ -73,16 +79,18 @@ const channel_selected = await ChannelRepository.getChannelById(channel_id);
                 workspace: channel.workspace,
                 messages: messages
             }
-        })
+        });
     } catch (error) {
-        console.error("Error en getChannelByIdController:", error)
-        return res.json({
+        console.error("Error en getChannelByIdController:", error);
+        return res.status(500).json({
             ok: false,
             message: "Internal server error",
             status: 500,
-        })
+            error: error.message,
+        });
     }
-}
+};
+
 export const getChannelsListController = async (req, res) =>{
     try{
         const {id} = req.user
