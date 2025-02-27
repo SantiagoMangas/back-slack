@@ -65,21 +65,29 @@ export const getChannelByIdController = async (req, res) => {
         const channel = channels[0];
         console.log("Canal encontrado:", channel);
 
-        // Obtener los mensajes del canal
-        const messages = await MessageRepository.getAllMessagesFromChannel(channel_id);
-        console.log("Mensajes obtenidos:", messages);
-
-        return res.json({
-            ok: true,
-            status: 200,
-            message: 'Channel data',
-            data: {
-                _id: channel._id,
-                name: channel.name,
-                workspace: channel.workspace,
-                messages: messages
-            }
-        });
+        // 🔍 Posible causa del error: Obtener mensajes
+        try {
+            const messages = await MessageRepository.getAllMessagesFromChannel(channel_id);
+            console.log("Mensajes obtenidos:", messages);
+            return res.json({
+                ok: true,
+                status: 200,
+                message: 'Channel data',
+                data: {
+                    _id: channel._id,
+                    name: channel.name,
+                    workspace: channel.workspace,
+                    messages: messages
+                }
+            });
+        } catch (msgError) {
+            console.error("Error obteniendo los mensajes:", msgError);
+            return res.status(500).json({
+                ok: false,
+                message: "Error obteniendo los mensajes del canal",
+                status: 500
+            });
+        }
     } catch (error) {
         console.error("Error en getChannelByIdController:", error);
         return res.status(500).json({
