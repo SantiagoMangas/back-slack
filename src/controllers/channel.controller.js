@@ -18,7 +18,10 @@ export const createChannelController = async (req, res) => {
           status: 400,
         })
       }
-  
+      
+      if (!workspace_id) {
+        return res.status(400).json({ ok: false, message: "workspace_id es requerido", status: 400 });
+      }      
       const channel_created = await ChannelRepository.createChannel(id, { name, workspace_id })
       console.log("Canal creado:", channel_created)
   
@@ -65,7 +68,6 @@ export const getChannelByIdController = async (req, res) => {
         const channel = channels[0];
         console.log("Canal encontrado:", channel);
 
-        // 🔍 Posible causa del error: Obtener mensajes
         try {
             const messages = await MessageRepository.getAllMessagesFromChannel(channel_id);
             console.log("Mensajes obtenidos:", messages);
