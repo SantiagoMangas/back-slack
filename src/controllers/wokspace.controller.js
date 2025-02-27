@@ -18,7 +18,7 @@ export const createWorkspaceController = async (req, res) => {
         })
       }
   
-      const workspace = await WorkspaceRepository.createWorkspace(id, name)
+      const workspace = await WorkspaceRepository.createWorkspace({ name, id })
   
       return res.status(201).json({
         ok: true,

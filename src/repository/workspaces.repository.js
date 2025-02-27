@@ -45,7 +45,7 @@ class WorkspaceRepository {
 
         const queryInsertMember = `INSERT INTO workspace_members (workspace_id, user_id) VALUES (?, ?)`
         await pool.execute(queryInsertMember, [result.insertId, id])
-
+        console.log("Resultado de la creación del workspace:", result);
         return {_id: result.insertId, name, owner: id}
     }
     
